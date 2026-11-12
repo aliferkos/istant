@@ -138,8 +138,9 @@ public final class LootGenerator {
                 if (tier >= 2) ench(meta, "looting", Math.min(3, tier));
                 if (tier >= 1) {
                     double bonus = 0.5 * tier + 0.25 * floor;
-                    attr(meta, mat, "attack_damage", bonus, EquipmentSlotGroup.MAINHAND);
-                    stats.add("<red>+" + fmt(bonus) + " de dano extra");
+                    if (attr(meta, mat, "attack_damage", bonus, EquipmentSlotGroup.MAINHAND)) {
+                        stats.add("<red>+" + fmt(bonus) + " de dano extra");
+                    }
                 }
             }
             case BOW -> {
@@ -159,12 +160,12 @@ public final class LootGenerator {
                 EquipmentSlotGroup group = slot.getGroup();
                 if (tier >= 1) {
                     double hp = 2.0 * tier;
-                    attr(meta, mat, "max_health", hp, group);
-                    stats.add("<red>+" + (int) (hp / 2) + " ❤");
+                    if (attr(meta, mat, "max_health", hp, group)) stats.add("<red>+" + (int) (hp / 2) + " ❤");
                 }
                 if (tier >= 2) {
-                    attr(meta, mat, "movement_speed", 0.005 * tier, group);
-                    stats.add("<aqua>+" + (5 * tier) + "% de velocidade");
+                    if (attr(meta, mat, "movement_speed", 0.005 * tier, group)) {
+                        stats.add("<aqua>+" + (5 * tier) + "% de velocidade");
+                    }
                 }
                 if (kind == Kind.BOOTS && theme == Theme.GELO) ench(meta, "frost_walker", 1);
             }
@@ -191,15 +192,25 @@ public final class LootGenerator {
     }
 
     /** Adiciona um atributo sem apagar os atributos padrão do item (dano base, armadura...). */
-    private void attr(ItemMeta meta, Material mat, String name, double amount, EquipmentSlotGroup group) {
+    private boolean attr(ItemMeta meta, Material mat, String name, double amount, EquipmentSlotGroup group) {
         Attribute attribute = Attr.get(name);
-        if (attribute == null) return;
+        if (attribute == null) return false;
         if (!meta.hasAttributeModifiers()) {
-            Multimap<Attribute, AttributeModifier> defaults = mat.getDefaultAttributeModifiers(mat.getEquipmentSlot());
-            meta.setAttributeModifiers(defaults);
+            try {
+                Multimap<Attribute, AttributeModifier> defaults = mat.getDefaultAttributeModifiers(mat.getEquipmentSlot());
+                meta.setAttributeModifiers(defaults);
+            } catch (Throwable t) {
+                // versão sem esse método: não adiciona o bônus para não apagar o dano/armadura base do item
+                return false;
+            }
         }
-        NamespacedKey key = new NamespacedKey(plugin, "loot_" + name + "_" + UUID.randomUUID().toString().substring(0, 8));
-        meta.addAttributeModifier(attribute, new AttributeModifier(key, amount, AttributeModifier.Operation.ADD_NUMBER, group));
+        try {
+            NamespacedKey key = new NamespacedKey(plugin, "loot_" + name + "_" + UUID.randomUUID().toString().substring(0, 8));
+            meta.addAttributeModifier(attribute, new AttributeModifier(key, amount, AttributeModifier.Operation.ADD_NUMBER, group));
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
     }
 
     private static String fmt(double v) {

@@ -35,7 +35,7 @@ public final class DungeonManager {
             for (DungeonInstance inst : new ArrayList<>(instances)) {
                 try {
                     inst.tick();
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     plugin.getLogger().severe("Erro na fenda " + inst.id() + ": " + e);
                     e.printStackTrace();
                     inst.end("<red>A fenda colapsou por um erro. Você foi devolvido.");

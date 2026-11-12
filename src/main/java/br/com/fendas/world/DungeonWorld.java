@@ -72,25 +72,34 @@ public final class DungeonWorld {
         world.setTime(6000);
         world.setStorm(false);
         world.setThundering(false);
-        rule(GameRule.DO_MOB_SPAWNING, false);
-        rule(GameRule.DO_DAYLIGHT_CYCLE, false);
-        rule(GameRule.DO_WEATHER_CYCLE, false);
-        rule(GameRule.DO_FIRE_TICK, false);
-        rule(GameRule.MOB_GRIEFING, false);
-        rule(GameRule.KEEP_INVENTORY, true);
-        rule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
-        rule(GameRule.DO_INSOMNIA, false);
-        rule(GameRule.DO_PATROL_SPAWNING, false);
-        rule(GameRule.DO_TRADER_SPAWNING, false);
-        rule(GameRule.SPAWN_CHUNK_RADIUS, 0);
+        // Os nomes das gamerules mudaram entre versões (1.21 -> 26.x).
+        // Procuramos por nome e ignoramos as que não existirem na versão do servidor.
+        rule(false, "DO_MOB_SPAWNING", "SPAWN_MOBS");
+        rule(false, "DO_DAYLIGHT_CYCLE", "ADVANCE_TIME");
+        rule(false, "DO_WEATHER_CYCLE", "ADVANCE_WEATHER");
+        rule(false, "DO_FIRE_TICK");
+        rule(0, "FIRE_SPREAD_RADIUS_AROUND_PLAYER");
+        rule(false, "MOB_GRIEFING");
+        rule(true, "KEEP_INVENTORY");
+        rule(false, "ANNOUNCE_ADVANCEMENTS", "SHOW_ADVANCEMENT_MESSAGES");
+        rule(false, "DO_INSOMNIA", "SPAWN_PHANTOMS");
+        rule(false, "DO_PATROL_SPAWNING", "SPAWN_PATROLS");
+        rule(false, "DO_TRADER_SPAWNING", "SPAWN_WANDERING_TRADERS");
         return true;
     }
 
-    private <T> void rule(GameRule<T> rule, T value) {
-        try {
-            world.setGameRule(rule, value);
-        } catch (Throwable ignored) {
-            // algumas gamerules mudaram de nome em versões novas; ignoramos as que não existem
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private void rule(Object value, String... fieldNames) {
+        for (String name : fieldNames) {
+            try {
+                Object field = GameRule.class.getField(name).get(null);
+                if (field instanceof GameRule rule) {
+                    world.setGameRule(rule, value);
+                    return;
+                }
+            } catch (Throwable ignored) {
+                // não existe nesta versão: tenta o próximo nome
+            }
         }
     }
 

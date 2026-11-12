@@ -1,0 +1,37 @@
+# ============================================================
+#  FENDAS - Masmorras roguelike com salas geradas automaticamente
+# ============================================================
+
+# Mundo vazio usado pelas fendas. O plugin APAGA e recria este mundo a cada
+# inicialização do servidor (só se encontrar o arquivo .fendas-marker dentro
+# da pasta, ou seja, nunca apaga um mundo que não foi criado por ele).
+mundo: fendas
+
+# Distância (em blocos, no eixo X) entre uma partida e outra.
+espacamento-instancias: 1000
+altura-base: 100
+
+grupo:
+  tamanho-maximo: 4
+  raio-altar: 6          # jogadores a até X blocos do altar entram no grupo
+
+partida:
+  andares-maximos: 3     # quantos andares dá para descer em uma mesma fenda
+  ondas-por-sala: 3
+  contagem-inicial: 5    # segundos antes da 1ª onda
+  tempo-limite-minutos: 40
+  blocos-por-tick: 2500  # velocidade de construção das salas (menor = menos lag)
+
+ondas:
+  base: 3                # mobs na 1ª onda
+  por-onda: 2            # + mobs a cada onda seguinte
+  por-jogador: 2         # + mobs por jogador extra no grupo
+  maximo: 24
+
+chave:
+  material: ECHO_SHARD
+  chance-drop: 0.005     # 0.5% por monstro morto por jogador (fora das fendas)
+  chance-no-bau: 0.15    # chance de vir outra Pedra de Fenda no baú do tesouro
+
+# Altares (preenchido pelo comando /fenda altar adicionar)
+altares: []

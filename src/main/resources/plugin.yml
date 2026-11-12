@@ -1,0 +1,15 @@
+name: Fendas
+version: '${project.version}'
+main: br.com.fendas.FendasPlugin
+api-version: '1.21'
+description: Masmorras roguelike instantâneas com salas geradas automaticamente.
+author: Fernando
+commands:
+  fenda:
+    description: Comandos das Fendas.
+    usage: /fenda <sair|info|chave|altar|iniciar|recarregar>
+    aliases: [fendas]
+permissions:
+  fendas.admin:
+    description: Comandos administrativos e construir no mundo das fendas.
+    default: op

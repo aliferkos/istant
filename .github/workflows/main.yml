@@ -1,0 +1,27 @@
+name: Compilar Fendas
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Compilar
+        run: mvn -B package --file pom.xml
+
+      - name: Publicar o .jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: Fendas-plugin
+          path: target/Fendas-*.jar
